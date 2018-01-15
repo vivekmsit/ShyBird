@@ -1,3 +1,4 @@
 <resources>
     <string name="app_name">ShyBird</string>
+    <string name="title_activity_authenticator">shyBird</string>
 </resources>
