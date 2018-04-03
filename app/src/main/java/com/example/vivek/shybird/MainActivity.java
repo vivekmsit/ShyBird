@@ -3,6 +3,9 @@ package com.example.vivek.shybird;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
+import android.view.View;
+import android.widget.Button;
+import android.widget.Toast;
 
 import com.amazonaws.AmazonServiceException;
 import com.amazonaws.mobile.client.AWSMobileClient;
@@ -26,7 +29,8 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        AWSMobileClient.getInstance().initialize(this).execute();
+
+        //AWSMobileClient.getInstance().initialize(this).execute();
 
         // Instantiate a AmazonDynamoDBMapperClient
         dynamoDBClient = new AmazonDynamoDBClient(AWSMobileClient.getInstance().getCredentialsProvider());
@@ -34,7 +38,15 @@ public class MainActivity extends AppCompatActivity {
                 .dynamoDBClient(dynamoDBClient)
                 .awsConfiguration(AWSMobileClient.getInstance().getConfiguration())
                 .build();
-        createTestTable();
+
+        // Initialize Button
+        Button createTableButton = findViewById(R.id.createTableButton);
+        createTableButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                createTestTable();
+            }
+        });
     }
 
     void createTestTable() {
@@ -48,9 +60,9 @@ public class MainActivity extends AppCompatActivity {
 
     void createTable() {
         KeySchemaElement kse = new KeySchemaElement().withAttributeName(
-                "userNo").withKeyType(KeyType.HASH);
+                "userId").withKeyType(KeyType.HASH);
         AttributeDefinition ad = new AttributeDefinition().withAttributeName(
-                "userNo").withAttributeType(ScalarAttributeType.N);
+                "userId").withAttributeType(ScalarAttributeType.N);
         ProvisionedThroughput pt = new ProvisionedThroughput()
                 .withReadCapacityUnits(10L).withWriteCapacityUnits(5L);
 
@@ -62,8 +74,10 @@ public class MainActivity extends AppCompatActivity {
             Log.d(TAG, "Sending Create table request");
             dynamoDBClient.createTable(request);
             Log.d(TAG, "Create request response successfully recieved");
+            Toast.makeText(this, "Create request response successfully recieved", Toast.LENGTH_LONG).show();
         } catch (AmazonServiceException ex) {
             Log.e(TAG, "Error sending create table request", ex);
+            Toast.makeText(this, "Error sending create table request" + ex.getMessage(), Toast.LENGTH_LONG).show();
         }
     }
 }
